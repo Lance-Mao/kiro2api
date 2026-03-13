@@ -195,6 +195,7 @@ function getProviderDisplayName(providerType) {
         'gemini-antigravity': 'Gemini Antigravity',
         'claude-custom': 'Claude Custom',
         'claude-kiro-oauth': 'Claude Kiro (OAuth)',
+        'claude-kiro-oauth-b': 'Claude Kiro B (OAuth)',
         'openai-custom': 'OpenAI Custom',
         'openaiResponses-custom': 'OpenAI Responses Custom',
         'openai-qwen-oauth': 'Qwen (OAuth)',

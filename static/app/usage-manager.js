@@ -323,44 +323,100 @@ function renderUsageData(data, container) {
  * @param {string} providerType - 提供商类型
  */
 export async function refreshProviderUsage(providerType) {
-    const loadingEl = document.getElementById('usageLoading');
     const refreshBtn = document.getElementById('refreshUsageBtn');
-    const contentEl = document.getElementById('usageContent');
-
-    // 显示加载状态
-    if (loadingEl) loadingEl.style.display = 'block';
     if (refreshBtn) refreshBtn.disabled = true;
 
     try {
         const providerName = getProviderDisplayName(providerType);
         showToast(t('common.info'), t('usage.refreshingProvider', { name: providerName }), 'info');
 
-        // 调用按提供商刷新的 API
-        const response = await fetch(`/api/usage/${providerType}?refresh=true`, {
-            method: 'GET',
-            headers: getAuthHeaders()
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        // 找到该提供商分组下的所有卡片
+        const groupContainer = document.querySelector(`.usage-provider-group[data-provider="${providerType}"]`);
+        if (!groupContainer) {
+            // 回退到旧逻辑
+            const response = await fetch(`/api/usage/${providerType}?refresh=true`, {
+                method: 'GET',
+                headers: getAuthHeaders()
+            });
+            if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            await loadUsage();
+            showToast(t('common.success'), t('common.refresh.success'), 'success');
+            return;
         }
 
-        const providerData = await response.json();
-        
-        // 获取当前完整数据并更新其中一个提供商的数据
-        // 注意：这里为了保持页面一致性，我们重新获取一次完整数据（走缓存）来重新渲染
-        // 或者手动在当前 DOM 中更新该提供商的部分。
-        // 为了简单可靠，我们重新 loadUsage()，它会读取刚刚更新过的后端缓存
-        await loadUsage();
+        const cards = groupContainer.querySelectorAll('.usage-instance-card[data-uuid]');
+        const uuids = Array.from(cards).map(card => card.getAttribute('data-uuid'));
 
-        showToast(t('common.success'), t('common.refresh.success'), 'success');
+        // 逐个刷新实例，实时更新卡片
+        let successCount = 0;
+        let errorCount = 0;
+        for (const uuid of uuids) {
+            const card = groupContainer.querySelector(`.usage-instance-card[data-uuid="${uuid}"]`);
+            if (card) card.classList.add('refreshing');
+            try {
+                await refreshSingleInstance(providerType, uuid);
+                successCount++;
+            } catch {
+                errorCount++;
+            }
+            // refreshing 状态会在 updateInstanceCard 中被新卡片替换掉
+        }
+
+        if (errorCount === 0) {
+            showToast(t('common.success'), t('common.refresh.success'), 'success');
+        } else {
+            showToast(t('common.info'), `${successCount} ${t('common.success')}, ${errorCount} ${t('common.error')}`, 'warning');
+        }
     } catch (error) {
         console.error(`刷新提供商 ${providerType} 失败:`, error);
         showToast(t('common.error'), t('common.refresh.failed') + ': ' + error.message, 'error');
     } finally {
-        if (loadingEl) loadingEl.style.display = 'none';
         if (refreshBtn) refreshBtn.disabled = false;
     }
+}
+
+/**
+ * 刷新单个实例的用量数据并更新卡片
+ * @param {string} providerType - 提供商类型
+ * @param {string} uuid - 实例 UUID
+ */
+async function refreshSingleInstance(providerType, uuid) {
+    const response = await fetch(`/api/usage/${encodeURIComponent(providerType)}/${encodeURIComponent(uuid)}?refresh=true`, {
+        method: 'GET',
+        headers: getAuthHeaders()
+    });
+
+    if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    const instanceData = await response.json();
+
+    // 找到对应卡片并原地更新
+    const oldCard = document.querySelector(`.usage-instance-card[data-uuid="${uuid}"]`);
+    if (oldCard) {
+        updateInstanceCard(oldCard, instanceData, providerType);
+    }
+
+    return instanceData;
+}
+
+/**
+ * 原地更新实例卡片的 DOM
+ * @param {HTMLElement} oldCard - 旧卡片元素
+ * @param {Object} instanceData - 新的实例数据
+ * @param {string} providerType - 提供商类型
+ */
+function updateInstanceCard(oldCard, instanceData, providerType) {
+    const wasCollapsed = oldCard.classList.contains('collapsed');
+    const newCard = createInstanceUsageCard(instanceData, providerType);
+    // 保持折叠状态
+    if (wasCollapsed) {
+        newCard.classList.add('collapsed');
+    } else {
+        newCard.classList.remove('collapsed');
+    }
+    oldCard.replaceWith(newCard);
 }
 
 /**
@@ -372,6 +428,7 @@ export async function refreshProviderUsage(providerType) {
 function createProviderGroup(providerType, instances) {
     const groupContainer = document.createElement('div');
     groupContainer.className = 'usage-provider-group collapsed';
+    groupContainer.setAttribute('data-provider', providerType);
     
     const providerDisplayName = getProviderDisplayName(providerType);
     const providerIcon = getProviderIcon(providerType);
@@ -390,6 +447,9 @@ function createProviderGroup(providerType, instances) {
             <span class="success-count ${successCount === instanceCount ? 'all-success' : ''}" data-i18n="usage.group.success" data-i18n-params='{"count":"${successCount}","total":"${instanceCount}"}'>${t('usage.group.success', { count: successCount, total: instanceCount })}</span>
         </div>
         <div class="usage-group-actions">
+            <button class="btn-toggle-cards btn-refresh-provider" title="${t('usage.doubleClickToRefresh') || '刷新该提供商用量'}">
+                <i class="fas fa-sync-alt"></i>
+            </button>
             <button class="btn-toggle-cards" title="${t('usage.group.expandAll')}">
                 <i class="fas fa-expand-alt"></i>
             </button>
@@ -404,8 +464,23 @@ function createProviderGroup(providerType, instances) {
     
     groupContainer.appendChild(header);
     
+    // 刷新该提供商按钮事件
+    const refreshProviderBtn = header.querySelector('.btn-refresh-provider');
+    refreshProviderBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const icon = refreshProviderBtn.querySelector('i');
+        refreshProviderBtn.disabled = true;
+        icon.classList.add('fa-spin');
+        try {
+            await refreshProviderUsage(providerType);
+        } finally {
+            refreshProviderBtn.disabled = false;
+            icon.classList.remove('fa-spin');
+        }
+    });
+
     // 展开/折叠所有卡片按钮事件
-    const toggleCardsBtn = header.querySelector('.btn-toggle-cards');
+    const toggleCardsBtn = header.querySelector('.btn-toggle-cards:not(.btn-refresh-provider)');
     toggleCardsBtn.addEventListener('click', (e) => {
         e.stopPropagation(); // 阻止事件冒泡到分组头部
         
@@ -459,6 +534,7 @@ function createProviderGroup(providerType, instances) {
 function createInstanceUsageCard(instance, providerType) {
     const card = document.createElement('div');
     card.className = `usage-instance-card ${instance.success ? 'success' : 'error'} collapsed`;
+    card.setAttribute('data-uuid', instance.uuid || 'unknown');
 
     const providerDisplayName = getProviderDisplayName(providerType);
     const providerIcon = getProviderIcon(providerType);
@@ -490,6 +566,9 @@ function createInstanceUsageCard(instance, providerType) {
             <i class="fas fa-chevron-right usage-toggle-icon"></i>
             <span class="collapsed-name" title="${displayName}">${displayName}</span>
             ${statusIcon}
+            <button class="btn-refresh-instance" title="${t('usage.card.refreshInstance') || '刷新该实例用量'}">
+                <i class="fas fa-sync-alt"></i>
+            </button>
         </div>
         ${showUsage ? `
         <div class="collapsed-summary-row collapsed-summary-usage-row">
@@ -503,7 +582,25 @@ function createInstanceUsageCard(instance, providerType) {
         </div>
         ` : ''}
     `;
-    
+
+    // 刷新按钮点击事件（在折叠摘要中）
+    const collapsedRefreshBtn = collapsedSummary.querySelector('.btn-refresh-instance');
+    if (collapsedRefreshBtn) {
+        collapsedRefreshBtn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const icon = collapsedRefreshBtn.querySelector('i');
+            collapsedRefreshBtn.disabled = true;
+            icon.classList.add('fa-spin');
+            try {
+                await refreshSingleInstance(providerType, instance.uuid || 'unknown');
+            } catch (err) {
+                console.error(`刷新实例 ${instance.uuid} 失败:`, err);
+                collapsedRefreshBtn.disabled = false;
+                icon.classList.remove('fa-spin');
+            }
+        });
+    }
+
     // 点击折叠摘要切换展开状态
     collapsedSummary.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -525,6 +622,8 @@ function createInstanceUsageCard(instance, providerType) {
         : (instance.isHealthy
             ? `<span class="badge badge-healthy" data-i18n="usage.card.status.healthy">${t('usage.card.status.healthy')}</span>`
             : `<span class="badge badge-unhealthy" data-i18n="usage.card.status.unhealthy">${t('usage.card.status.unhealthy')}</span>`);
+
+    // 刷新按钮（展开区域不再重复，已在折叠摘要中）
 
     // 下载按钮
     const downloadBtnHTML = instance.configFilePath ? `
@@ -562,7 +661,7 @@ function createInstanceUsageCard(instance, providerType) {
         </div>
         ${userInfoHTML}
     `;
-    
+
     // 添加下载按钮点击事件
     if (instance.configFilePath) {
         const downloadBtn = header.querySelector('.btn-download-config');
@@ -894,6 +993,7 @@ function getProviderDisplayName(providerType) {
 
     const names = {
         'claude-kiro-oauth': 'Claude Kiro OAuth',
+        'claude-kiro-oauth-b': 'Claude Kiro OAuth B',
         'gemini-cli-oauth': 'Gemini CLI OAuth',
         'gemini-antigravity': 'Gemini Antigravity',
         'openai-codex-oauth': 'Codex OAuth',
@@ -920,6 +1020,7 @@ function getProviderIcon(providerType) {
 
     const icons = {
         'claude-kiro-oauth': 'fas fa-robot',
+        'claude-kiro-oauth-b': 'fas fa-robot',
         'gemini-cli-oauth': 'fas fa-gem',
         'gemini-antigravity': 'fas fa-rocket',
         'openai-codex-oauth': 'fas fa-terminal',

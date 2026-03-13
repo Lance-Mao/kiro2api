@@ -462,7 +462,7 @@ async function openProviderManager(providerType) {
  */
 function generateAuthButton(providerType) {
     // 只为支持OAuth的提供商显示授权按钮
-    const oauthProviders = ['gemini-cli-oauth', 'gemini-antigravity', 'openai-qwen-oauth', 'claude-kiro-oauth', 'openai-iflow', 'openai-codex-oauth'];
+    const oauthProviders = ['gemini-cli-oauth', 'gemini-antigravity', 'openai-qwen-oauth', 'claude-kiro-oauth', 'claude-kiro-oauth-b', 'openai-iflow', 'openai-codex-oauth'];
 
     if (!oauthProviders.includes(providerType)) {
         return '';
@@ -492,7 +492,7 @@ function generateAuthButton(providerType) {
  */
 async function handleGenerateAuthUrl(providerType) {
     // 如果是 Kiro OAuth，先显示认证方式选择对话框
-    if (providerType === 'claude-kiro-oauth') {
+    if (providerType === 'claude-kiro-oauth' || providerType === 'claude-kiro-oauth-b') {
         showKiroAuthMethodSelector(providerType);
         return;
     }
@@ -2523,6 +2523,7 @@ function getAuthFilePath(provider) {
         'gemini-antigravity': '~/.antigravity/oauth_creds.json',
         'openai-qwen-oauth': '~/.qwen/oauth_creds.json',
         'claude-kiro-oauth': '~/.aws/sso/cache/kiro-auth-token.json',
+        'claude-kiro-oauth-b': '~/.aws/sso/cache/kiro-auth-token.json',
         'openai-iflow': '~/.iflow/oauth_creds.json'
     };
     return authFilePaths[provider] || (getCurrentLanguage() === 'en-US' ? 'Unknown Path' : '未知路径');
@@ -2543,7 +2544,7 @@ function showAuthModal(authUrl, authInfo) {
     
     // 获取需要开放的端口号（从 authInfo 或当前页面 URL）
     const requiredPort = authInfo.callbackPort || authInfo.port || window.location.port || '3000';
-    const isDeviceFlow = authInfo.provider === 'openai-qwen-oauth' || (authInfo.provider === 'claude-kiro-oauth' && authInfo.authMethod === 'builder-id');
+    const isDeviceFlow = authInfo.provider === 'openai-qwen-oauth' || ((authInfo.provider === 'claude-kiro-oauth' || authInfo.provider === 'claude-kiro-oauth-b') && authInfo.authMethod === 'builder-id');
 
     let instructionsHtml = '';
     if (authInfo.provider === 'openai-qwen-oauth') {
@@ -2558,7 +2559,7 @@ function showAuthModal(authUrl, authInfo) {
                 </ol>
             </div>
         `;
-    } else if (authInfo.provider === 'claude-kiro-oauth') {
+    } else if (authInfo.provider === 'claude-kiro-oauth' || authInfo.provider === 'claude-kiro-oauth-b') {
         const methodDisplay = authInfo.authMethod === 'builder-id' ? 'AWS Builder ID' : `Social (${authInfo.socialProvider || 'Google'})`;
         const methodAccount = authInfo.authMethod === 'builder-id' ? 'AWS Builder ID' : authInfo.socialProvider || 'Google';
         instructionsHtml = `
@@ -2609,7 +2610,7 @@ function showAuthModal(authUrl, authInfo) {
                 <div class="auth-info">
                     <p><strong data-i18n="oauth.modal.provider">${t('oauth.modal.provider')}</strong> ${authInfo.provider}</p>
                     <div class="port-info-section" style="margin: 12px 0; padding: 12px; background: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px; position: relative;">
-                        ${(authInfo.provider === 'claude-kiro-oauth' && authInfo.authMethod === 'builder-id') ? `
+                        ${((authInfo.provider === 'claude-kiro-oauth' || authInfo.provider === 'claude-kiro-oauth-b') && authInfo.authMethod === 'builder-id') ? `
                         <button class="regenerate-builder-id-btn" title="${t('common.generate')}" style="position: absolute; top: 12px; right: 12px; background: none; border: 1px solid #d97706; border-radius: 4px; cursor: pointer; color: #d97706; padding: 4px 8px;">
                             <i class="fas fa-sync-alt"></i>
                         </button>
@@ -2628,7 +2629,7 @@ function showAuthModal(authUrl, authInfo) {
                             }
                         </div>
                         <p style="margin: 8px 0 0 0; font-size: 0.85rem; color: #92400e;" data-i18n="oauth.modal.portNote">${t('oauth.modal.portNote')}</p>
-                        ${(authInfo.provider === 'claude-kiro-oauth' && authInfo.authMethod === 'builder-id') ? `
+                        ${((authInfo.provider === 'claude-kiro-oauth' || authInfo.provider === 'claude-kiro-oauth-b') && authInfo.authMethod === 'builder-id') ? `
                         <div class="builder-id-url-section" style="margin-top: 12px; padding-top: 12px; border-top: 1px dashed #fcd34d;">
                             <label style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #92400e;">
                                 <i class="fas fa-link"></i>

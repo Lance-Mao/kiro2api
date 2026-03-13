@@ -6,7 +6,7 @@ import { readUsageCache, writeUsageCache, readProviderUsageCache, updateProvider
 import { PROVIDER_MAPPINGS } from '../utils/provider-utils.js';
 import path from 'path';
 
-const supportedProviders = ['claude-kiro-oauth', 'gemini-cli-oauth', 'gemini-antigravity', 'openai-codex-oauth', 'grok-custom'];
+const supportedProviders = ['claude-kiro-oauth', 'claude-kiro-oauth-b', 'gemini-cli-oauth', 'gemini-antigravity', 'openai-codex-oauth', 'grok-custom'];
 
 
 /**
@@ -139,7 +139,7 @@ async function getProviderTypeUsage(providerType, currentConfig, providerPoolMan
  * @returns {Promise<Object>} 用量信息
  */
 async function getAdapterUsage(adapter, providerType) {
-    if (providerType === 'claude-kiro-oauth') {
+    if (providerType === 'claude-kiro-oauth' || providerType === 'claude-kiro-oauth-b') {
         if (typeof adapter.getUsageLimits === 'function') {
             const rawUsage = await adapter.getUsageLimits();
             return formatKiroUsage(rawUsage);
@@ -300,6 +300,94 @@ export async function handleGetUsage(req, res, currentConfig, providerPoolManage
         res.end(JSON.stringify({
             error: {
                 message: 'Failed to get usage info: ' + error.message
+            }
+        }));
+        return true;
+    }
+}
+
+/**
+ * 获取单个实例的用量信息
+ * @param {string} providerType - 提供商类型
+ * @param {string} uuid - 实例 UUID
+ * @param {Object} currentConfig - 当前配置
+ * @param {Object} providerPoolManager - 提供商池管理器
+ * @returns {Promise<Object>} 实例用量信息
+ */
+async function getSingleInstanceUsage(providerType, uuid, currentConfig, providerPoolManager) {
+    // 获取提供商池中的所有实例
+    let providers = [];
+    if (providerPoolManager && providerPoolManager.providerPools && providerPoolManager.providerPools[providerType]) {
+        providers = providerPoolManager.providerPools[providerType];
+    } else if (currentConfig.providerPools && currentConfig.providerPools[providerType]) {
+        providers = currentConfig.providerPools[providerType];
+    }
+
+    // 找到匹配的实例
+    const provider = providers.find(p => (p.uuid || 'unknown') === uuid);
+    if (!provider) {
+        throw new Error(`Instance ${uuid} not found for provider ${providerType}`);
+    }
+
+    const providerKey = providerType + (provider.uuid || '');
+    let adapter = serviceInstances[providerKey];
+
+    const instanceResult = {
+        uuid: provider.uuid || 'unknown',
+        name: getProviderDisplayName(provider, providerType),
+        configFilePath: getProviderConfigFilePath(provider, providerType),
+        isHealthy: provider.isHealthy !== false,
+        isDisabled: provider.isDisabled === true,
+        success: false,
+        usage: null,
+        error: null
+    };
+
+    if (provider.isDisabled) {
+        instanceResult.error = 'Provider is disabled';
+    } else if (!adapter) {
+        try {
+            const serviceConfig = {
+                ...CONFIG,
+                ...provider,
+                MODEL_PROVIDER: providerType
+            };
+            adapter = getServiceAdapter(serviceConfig);
+        } catch (initError) {
+            instanceResult.error = `Service instance initialization failed: ${initError.message}`;
+        }
+    }
+
+    if (adapter && !instanceResult.error) {
+        try {
+            const usage = await getAdapterUsage(adapter, providerType);
+            instanceResult.success = true;
+            instanceResult.usage = usage;
+        } catch (error) {
+            instanceResult.error = error.message;
+        }
+    }
+
+    return instanceResult;
+}
+
+/**
+ * 获取单个实例的用量限制
+ */
+export async function handleGetInstanceUsage(req, res, currentConfig, providerPoolManager, providerType, uuid) {
+    try {
+        logger.info(`[Usage API] Fetching usage data for ${providerType}/${uuid}`);
+        const instanceResult = await getSingleInstanceUsage(providerType, uuid, currentConfig, providerPoolManager);
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(instanceResult));
+        return true;
+    } catch (error) {
+        logger.error(`[UI API] Failed to get usage for ${providerType}/${uuid}:`, error);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+            error: {
+                message: `Failed to get usage info for ${providerType}/${uuid}: ` + error.message
             }
         }));
         return true;

@@ -331,7 +331,7 @@ async function handleGenerateCreds(event) {
 
     try {
         // 如果是 Kiro OAuth，先显示认证方式选择对话框
-        if (providerType === 'claude-kiro-oauth') {
+        if (providerType === 'claude-kiro-oauth' || providerType === 'claude-kiro-oauth-b') {
             const modal = document.createElement('div');
             modal.className = 'modal-overlay';
             modal.style.display = 'flex';

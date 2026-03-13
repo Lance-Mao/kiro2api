@@ -24,6 +24,17 @@ export const PROVIDER_MAPPINGS = [
         urlKeys: ['KIRO_BASE_URL', 'KIRO_REFRESH_URL', 'KIRO_REFRESH_IDC_URL']
     },
     {
+        // Kiro OAuth B 配置
+        dirName: 'kiro-b',
+        patterns: ['configs/kiro-b/', '/kiro-b/'],
+        providerType: 'claude-kiro-oauth-b',
+        credPathKey: 'KIRO_OAUTH_CREDS_FILE_PATH',
+        defaultCheckModel: 'claude-haiku-4-5',
+        displayName: 'Claude Kiro OAuth B',
+        needsProjectId: false,
+        urlKeys: ['KIRO_BASE_URL', 'KIRO_REFRESH_URL', 'KIRO_REFRESH_IDC_URL']
+    },
+    {
         // Gemini CLI OAuth 配置
         dirName: 'gemini',
         patterns: ['configs/gemini/', '/gemini/', 'configs/gemini-cli/'],

@@ -42,7 +42,7 @@ export async function handleGenerateAuthUrl(req, res, currentConfig, providerTyp
             const result = await handleQwenOAuth(currentConfig, options);
             authUrl = result.authUrl;
             authInfo = result.authInfo;
-        } else if (providerType === 'claude-kiro-oauth') {
+        } else if (providerType === 'claude-kiro-oauth' || providerType === 'claude-kiro-oauth-b') {
             // Kiro OAuth 支持多种认证方式
             // options.method 可以是: 'google' | 'github' | 'builder-id'
             const result = await handleKiroOAuth(currentConfig, options);

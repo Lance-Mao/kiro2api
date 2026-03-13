@@ -29,12 +29,19 @@ function getProviderConfigs(supportedProviders = []) {
             defaultPath: 'configs/antigravity/',
             visible: supportedProviders.includes('gemini-antigravity') 
         },
-        { 
-            id: 'claude-kiro-oauth', 
-            name: t('dashboard.routing.nodeName.kiro'), 
+        {
+            id: 'claude-kiro-oauth',
+            name: t('dashboard.routing.nodeName.kiro'),
             icon: 'fa-key',
             defaultPath: 'configs/kiro/',
-            visible: supportedProviders.includes('claude-kiro-oauth') 
+            visible: supportedProviders.includes('claude-kiro-oauth')
+        },
+        {
+            id: 'claude-kiro-oauth-b',
+            name: t('dashboard.routing.nodeName.kiroB') || 'Claude Kiro OAuth B',
+            icon: 'fa-key',
+            defaultPath: 'configs/kiro-b/',
+            visible: supportedProviders.includes('claude-kiro-oauth-b')
         },
         { 
             id: 'openai-codex-oauth', 
@@ -261,6 +268,32 @@ function getProviderTypeFields(providerType) {
             }
         ],
         'claude-kiro-oauth': [
+            {
+                id: 'KIRO_OAUTH_CREDS_FILE_PATH',
+                label: t('modal.provider.field.oauthPath'),
+                type: 'text',
+                placeholder: t('modal.provider.field.oauthPath.kiro.placeholder')
+            },
+            {
+                id: 'KIRO_BASE_URL',
+                label: `${t('modal.provider.field.baseUrl')} <span class="optional-tag">${t('config.optional')}</span>`,
+                type: 'text',
+                placeholder: 'https://codewhisperer.{{region}}.amazonaws.com/generateAssistantResponse'
+            },
+            {
+                id: 'KIRO_REFRESH_URL',
+                label: `${t('modal.provider.field.refreshUrl')} <span class="optional-tag">${t('config.optional')}</span>`,
+                type: 'text',
+                placeholder: 'https://prod.{{region}}.auth.desktop.kiro.dev/refreshToken'
+            },
+            {
+                id: 'KIRO_REFRESH_IDC_URL',
+                label: `${t('modal.provider.field.refreshIdcUrl')} <span class="optional-tag">${t('config.optional')}</span>`,
+                type: 'text',
+                placeholder: 'https://oidc.{{region}}.amazonaws.com/token'
+            }
+        ],
+        'claude-kiro-oauth-b': [
             {
                 id: 'KIRO_OAUTH_CREDS_FILE_PATH',
                 label: t('modal.provider.field.oauthPath'),

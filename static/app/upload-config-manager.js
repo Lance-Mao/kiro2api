@@ -1026,6 +1026,12 @@ function detectProviderFromPath(filePath) {
     // 定义目录到提供商的映射关系
     const providerMappings = [
         {
+            patterns: ['configs/kiro-b/', '/kiro-b/'],
+            providerType: 'claude-kiro-oauth-b',
+            displayName: 'Claude Kiro OAuth B',
+            shortName: 'kiro-oauth-b'
+        },
+        {
             patterns: ['configs/kiro/', '/kiro/'],
             providerType: 'claude-kiro-oauth',
             displayName: 'Claude Kiro OAuth',

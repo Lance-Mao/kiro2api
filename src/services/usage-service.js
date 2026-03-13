@@ -14,7 +14,8 @@ import { MODEL_PROVIDER } from '../utils/common.js';
 export class UsageService {
     constructor() {
         this.providerHandlers = {
-            [MODEL_PROVIDER.KIRO_API]: this.getKiroUsage.bind(this),
+            [MODEL_PROVIDER.KIRO_API]: (uuid) => this.getKiroUsage(MODEL_PROVIDER.KIRO_API, uuid),
+            [MODEL_PROVIDER.KIRO_API_B]: (uuid) => this.getKiroUsage(MODEL_PROVIDER.KIRO_API_B, uuid),
             [MODEL_PROVIDER.GEMINI_CLI]: this.getGeminiUsage.bind(this),
             [MODEL_PROVIDER.ANTIGRAVITY]: this.getAntigravityUsage.bind(this),
             [MODEL_PROVIDER.CODEX_API]: this.getCodexUsage.bind(this),
@@ -87,8 +88,8 @@ export class UsageService {
      * @param {string} [uuid] - 可选的提供商实例 UUID
      * @returns {Promise<Object>} Kiro 用量信息
      */
-    async getKiroUsage(uuid = null) {
-        const providerKey = uuid ? MODEL_PROVIDER.KIRO_API + uuid : MODEL_PROVIDER.KIRO_API;
+    async getKiroUsage(providerType = MODEL_PROVIDER.KIRO_API, uuid = null) {
+        const providerKey = uuid ? providerType + uuid : providerType;
         const adapter = serviceInstances[providerKey];
         
         if (!adapter) {

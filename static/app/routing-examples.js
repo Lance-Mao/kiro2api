@@ -152,6 +152,17 @@ function getAvailableRoutes() {
             badgeClass: 'oauth'
         },
         {
+            provider: 'claude-kiro-oauth-b',
+            name: 'Claude Kiro OAuth B',
+            paths: {
+                openai: '/claude-kiro-oauth-b/v1/chat/completions',
+                claude: '/claude-kiro-oauth-b/v1/messages'
+            },
+            description: t('dashboard.routing.free'),
+            badge: t('dashboard.routing.free'),
+            badgeClass: 'oauth'
+        },
+        {
             provider: 'openai-custom',
             name: 'OpenAI Custom',
             paths: {
@@ -290,6 +301,7 @@ async function copyCurlExample(provider, options = {}) {
     switch (provider) {
         case 'claude-custom':
         case 'claude-kiro-oauth':
+        case 'claude-kiro-oauth-b':
             if (protocol === 'openai') {
                 curlCommand = `curl http://localhost:3000${path} \\
   -H "Content-Type: application/json" \\
@@ -427,6 +439,7 @@ function renderRoutingExamples(providerConfigs) {
         'openai-custom': 'fa-comments',
         'claude-custom': 'fa-brain',
         'claude-kiro-oauth': 'fa-robot',
+        'claude-kiro-oauth-b': 'fa-robot',
         'openai-qwen-oauth': 'fa-code',
         'openaiResponses-custom': 'fa-comment-alt',
         'openai-iflow': 'fa-wind',
@@ -440,6 +453,7 @@ function renderRoutingExamples(providerConfigs) {
         'gemini-antigravity': 'gemini-3-flash-preview',
         'claude-custom': 'claude-sonnet-4-6',
         'claude-kiro-oauth': 'claude-sonnet-4-6',
+        'claude-kiro-oauth-b': 'claude-sonnet-4-6',
         'openai-custom': 'gpt-4o',
         'openai-qwen-oauth': 'qwen3-coder-plus',
         'openai-iflow': 'qwen3-max',
