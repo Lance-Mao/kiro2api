@@ -1,6 +1,6 @@
 services:
   aiclient-api:
-    # 方式二：从 Dockerfile 本地构建
+    # 从 Dockerfile 本地构建
     # 使用方法: docker compose -f docker-compose.build.yml up -d --build
     build:
       context: ..
@@ -8,17 +8,24 @@ services:
     container_name: aiclient2api
     restart: unless-stopped
     ports:
-      - "3000:3000"
-      - "8085-8087:8085-8087" 
+      - "3200:3000"
+      - "8085-8087:8085-8087"
       - "1455:1455"
       - "19876-19880:19876-19880"
     volumes:
       - ./configs:/app/configs
     environment:
       - ARGS=
+    networks:
+      - new-api-network
     healthcheck:
       test: ["CMD", "node", "healthcheck.js"]
       interval: 30s
       timeout: 3s
       start_period: 5s
       retries: 3
+
+networks:
+  new-api-network:
+    external: true
+    name: docker_new-api-network

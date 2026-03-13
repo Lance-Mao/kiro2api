@@ -285,6 +285,14 @@ export async function handleUIApiRequests(method, pathParam, req, res, currentCo
         return await usageApi.handleGetSupportedProviders(req, res);
     }
 
+    // Get usage limits for a specific instance (provider + uuid)
+    const usageInstanceMatch = pathParam.match(/^\/api\/usage\/([^\/]+)\/([^\/]+)$/);
+    if (method === 'GET' && usageInstanceMatch) {
+        const providerType = decodeURIComponent(usageInstanceMatch[1]);
+        const uuid = decodeURIComponent(usageInstanceMatch[2]);
+        return await usageApi.handleGetInstanceUsage(req, res, currentConfig, providerPoolManager, providerType, uuid);
+    }
+
     // Get usage limits for a specific provider type
     const usageProviderMatch = pathParam.match(/^\/api\/usage\/([^\/]+)$/);
     if (method === 'GET' && usageProviderMatch) {
