@@ -301,6 +301,37 @@
     box-shadow: var(--shadow-sm);
 }
 
+.btn-refresh-instance {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.7rem;
+    transition: var(--transition);
+    flex-shrink: 0;
+}
+
+.btn-refresh-instance:hover {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-refresh-instance:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.usage-instance-card.refreshing .usage-card-collapsed-summary {
+    opacity: 0.6;
+}
+
 .badge {
     font-size: 0.75rem; padding: 0.125rem 0.5rem; border-radius: 9999px; font-weight: 500;
 }
