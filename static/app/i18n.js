@@ -32,6 +32,7 @@ const translations = {
         'nav.providers': '提供商池管理',
         'nav.upload': '凭据文件管理',
         'nav.usage': '用量查询',
+        'nav.proxy': '代理管理',
         'nav.logs': '实时日志',
         'nav.plugins': '插件管理',
         'nav.models': '可用模型',

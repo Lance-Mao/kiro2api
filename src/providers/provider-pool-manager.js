@@ -6,6 +6,7 @@ import { getProviderModels } from './provider-models.js';
 import { broadcastEvent } from '../ui-modules/event-broadcast.js';
 import { convertData } from '../convert/convert.js';
 import { ENDPOINT_TYPE } from '../utils/common.js';
+import { ProxyPoolManager } from '../utils/proxy-pool-manager.js';
 
 /**
  * Manages a pool of API service providers, handling their health and selection.
@@ -76,7 +77,10 @@ export class ProviderPoolManager {
         
         // 用于并发选点时的原子排序辅助（自增序列）
         this._selectionSequence = 0;
- 
+
+        // 初始化代理池管理器
+        this.proxyPoolManager = new ProxyPoolManager(this.globalConfig);
+
         this.initializeProviderStatus();
     }
 

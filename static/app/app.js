@@ -8,6 +8,7 @@ import {
 
 import {
     showToast,
+    showConfirm,
     getProviderStats
 } from './utils.js';
 
@@ -226,6 +227,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // 导出全局函数供其他模块使用
+window.showToast = showToast;
+window.showConfirm = showConfirm;
 window.loadProviders = loadProviders;
 window.openProviderManager = openProviderManager;
 window.showProviderManagerModal = showProviderManagerModal;

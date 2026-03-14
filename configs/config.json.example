@@ -50,6 +50,13 @@
             "gemini-cli-oauth",
             "gemini-antigravity"
     ],
+    "PROXY_POOL": [
+        "socks5://proxy1.example.com:1080",
+        "socks5://proxy2.example.com:1080",
+        "socks5://proxy3.example.com:1080"
+    ],
+    "PROXY_ASSIGN_STRATEGY": "hash",
+    "PROXY_AUTO_ASSIGN": true,
     "LOG_ENABLED": true,
     "LOG_OUTPUT_MODE": "all",
     "LOG_LEVEL": "info",

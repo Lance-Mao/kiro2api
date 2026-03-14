@@ -1,6 +1,6 @@
 // 配置管理功能模块
 
-import { showToast } from './utils.js';
+import { showToast, showConfirm } from './utils.js';
 import { t } from './i18n.js';
 
 let allConfigs = []; // 存储所有配置数据
@@ -1146,10 +1146,10 @@ async function batchLinkProviderConfigs() {
         .join(', ');
     
     const confirmMsg = t('upload.batchLink.confirm', { count: unlinkedConfigs.length, summary: providerSummary });
-    if (!confirm(confirmMsg)) {
+    if (!await showConfirm(confirmMsg)) {
         return;
     }
-    
+
     showToast(t('common.info'), t('upload.batchLink.processing', { count: unlinkedConfigs.length }), 'info');
     
     try {
@@ -1205,10 +1205,10 @@ async function deleteUnboundConfigs() {
     
     // 显示确认对话框
     const confirmMsg = t('upload.deleteUnbound.confirm', { count: unboundConfigs.length });
-    if (!confirm(confirmMsg)) {
+    if (!await showConfirm(confirmMsg)) {
         return;
     }
-    
+
     try {
         showToast(t('common.info'), t('upload.deleteUnbound.processing'), 'info');
         

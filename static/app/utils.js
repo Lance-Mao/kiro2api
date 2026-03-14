@@ -486,11 +486,43 @@ async function apiRequest(url, options = {}) {
     return apiClient.request(endpoint, options);
 }
 
-// 导出所有工具函数
+/**
+ * 显示自定义确认对话框（替代浏览器原生 confirm）
+ * @param {string} message - 确认消息
+ * @param {string} [title='确认'] - 标题
+ * @returns {Promise<boolean>}
+ */
+function showConfirm(message, title = '确认') {
+    return new Promise((resolve) => {
+        const overlay = document.createElement('div');
+        overlay.className = 'proxy-modal-overlay';
+        overlay.style.zIndex = '99999';
+        overlay.innerHTML = `
+            <div class="proxy-modal" style="max-width:420px">
+                <div class="proxy-modal-header">
+                    <h3>${escapeHtml(title)}</h3>
+                </div>
+                <div class="proxy-modal-body">
+                    <p style="margin:0;color:var(--text-secondary);line-height:1.6">${escapeHtml(message)}</p>
+                </div>
+                <div class="proxy-modal-footer">
+                    <button class="btn-secondary" id="confirmNo">取消</button>
+                    <button class="btn-primary" id="confirmYes">确认</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+        overlay.querySelector('#confirmYes').addEventListener('click', () => { overlay.remove(); resolve(true); });
+        overlay.querySelector('#confirmNo').addEventListener('click', () => { overlay.remove(); resolve(false); });
+    });
+}
+
+
 export {
     formatUptime,
     escapeHtml,
     showToast,
+    showConfirm,
     getFieldLabel,
     getProviderTypeFields,
     getProviderConfigs,

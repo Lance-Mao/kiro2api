@@ -12,6 +12,7 @@ import * as systemApi from '../ui-modules/system-api.js';
 import * as updateApi from '../ui-modules/update-api.js';
 import * as oauthApi from '../ui-modules/oauth-api.js';
 import * as eventBroadcast from '../ui-modules/event-broadcast.js';
+import * as proxyApi from '../ui-modules/proxy-api.js';
 
 // Re-export from event-broadcast module
 export { broadcastEvent, initializeUIManagement, handleUploadOAuthCredentials, upload } from '../ui-modules/event-broadcast.js';
@@ -292,6 +293,15 @@ export async function handleUIApiRequests(method, pathParam, req, res, currentCo
         return await usageApi.handleGetProviderUsage(req, res, currentConfig, providerPoolManager, providerType);
     }
 
+    // Get usage limits for a specific instance (must be after supported-providers and single-segment match)
+    const usageInstanceMatch = pathParam.match(/^\/api\/usage\/([^\/]+)\/([^\/]+)$/);
+    if (method === 'GET' && usageInstanceMatch) {
+        // 排除 supported-providers 等已处理的路径
+        const providerType = decodeURIComponent(usageInstanceMatch[1]);
+        const uuid = decodeURIComponent(usageInstanceMatch[2]);
+        return await usageApi.handleGetInstanceUsage(req, res, currentConfig, providerPoolManager, providerType, uuid);
+    }
+
     // Check for updates - compare local VERSION with latest git tag
     if (method === 'GET' && pathParam === '/api/check-update') {
         return await updateApi.handleCheckUpdate(req, res);
@@ -333,6 +343,19 @@ export async function handleUIApiRequests(method, pathParam, req, res, currentCo
     // Import AWS SSO credentials for Kiro
     if (method === 'POST' && pathParam === '/api/kiro/import-aws-credentials') {
         return await oauthApi.handleImportAwsCredentials(req, res);
+    }
+
+    // Proxy management API routes
+    if (method === 'GET' && pathParam === '/api/proxy-pool') {
+        return await proxyApi.handleGetProxyPool(req, res);
+    }
+
+    if (method === 'POST' && pathParam === '/api/proxy-pool') {
+        return await proxyApi.handleUpdateProxyPool(req, res);
+    }
+
+    if (method === 'POST' && pathParam === '/api/proxy-pool/health-check') {
+        return await proxyApi.handleProxyHealthCheck(req, res);
     }
 
     // Get plugins list

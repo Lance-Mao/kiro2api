@@ -1,0 +1,621 @@
+.proxy-management {
+    padding: 20px;
+}
+
+.proxy-management .card {
+    background: var(--bg-primary);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-color);
+}
+
+.proxy-management .card h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: var(--text-primary);
+    font-size: 18px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.proxy-management .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.form-group input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+.proxy-management .form-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 14px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.proxy-list {
+    margin-bottom: 10px;
+}
+
+.proxy-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.proxy-management .proxy-item input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    transition: var(--transition);
+}
+
+.proxy-management .proxy-item input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(--primary-10);
+}
+
+.proxy-management .proxy-stats {
+    margin-top: 20px;
+    padding: 15px;
+    background: var(--bg-secondary);
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+}
+
+.proxy-management .proxy-stats h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 16px;
+    color: var(--text-primary);
+}
+
+.proxy-management .proxy-stats p {
+    margin: 5px 0;
+    color: var(--text-secondary);
+}
+
+.distribution {
+    margin-top: 10px;
+}
+
+.proxy-management .dist-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.proxy-management .dist-item:last-child {
+    border-bottom: none;
+}
+
+.proxy-management .proxy-name {
+    color: var(--text-secondary);
+    font-family: monospace;
+    font-size: 13px;
+}
+
+.proxy-management .account-count {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.batch-operations {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.proxy-management .batch-operations select {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.proxy-management .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.proxy-management .data-table th,
+.proxy-management .data-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.proxy-management .data-table th {
+    background: var(--bg-secondary);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.proxy-management .data-table tbody tr:hover {
+    background: var(--bg-secondary);
+}
+
+.proxy-management .data-table code {
+    background: var(--bg-tertiary);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+    color: var(--text-primary);
+}
+
+.proxy-management .proxy-display {
+    font-family: monospace;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.status-custom {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.status-auto {
+    background: #f3e5f5;
+    color: #7b1fa2;
+}
+
+.status-global {
+    background: #f5f5f5;
+    color: #666;
+}
+
+.btn-primary,
+.btn-secondary,
+.btn-danger,
+.btn-small {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.btn-primary {
+    background: #1976d2;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #1565c0;
+}
+
+.btn-secondary {
+    background: #757575;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #616161;
+}
+
+.btn-danger {
+    background: #d32f2f;
+    color: white;
+    padding: 6px 12px;
+}
+
+.btn-danger:hover {
+    background: #c62828;
+}
+
+.btn-small {
+    background: #2196f3;
+    color: white;
+    padding: 6px 12px;
+    font-size: 13px;
+}
+
+.btn-small:hover {
+    background: #1976d2;
+}
+
+.proxy-management .loading {
+    text-align: center;
+    color: var(--text-tertiary);
+    padding: 40px !important;
+}
+
+/* 深色主题适配 */
+[data-theme="dark"] .proxy-management .status-custom {
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+}
+
+[data-theme="dark"] .proxy-management .status-auto {
+    background: rgba(168, 85, 247, 0.2);
+    color: #c084fc;
+}
+
+[data-theme="dark"] .proxy-management .status-global {
+    background: rgba(100, 116, 139, 0.2);
+    color: #94a3b8;
+}
+
+/* 按钮样式 */
+.proxy-management .btn-primary,
+.proxy-management .btn-secondary,
+.proxy-management .btn-danger,
+.proxy-management .btn-small {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.proxy-management .btn-primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+.proxy-management .btn-primary:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px var(--primary-20);
+}
+
+.proxy-management .btn-secondary {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.proxy-management .btn-secondary:hover {
+    background: var(--border-hover);
+    border-color: var(--border-hover);
+}
+
+.proxy-management .btn-danger {
+    background: var(--danger-color);
+    color: white;
+    padding: 8px 14px;
+    font-size: 13px;
+}
+
+.proxy-management .btn-danger:hover {
+    background: var(--danger-alt);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px var(--danger-30);
+}
+
+.proxy-management .btn-small {
+    background: var(--info-color);
+    color: white;
+    padding: 6px 14px;
+    font-size: 13px;
+}
+
+.proxy-management .btn-small:hover {
+    background: var(--info-color-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px var(--primary-20);
+}
+
+/* 代理项样式 */
+.proxy-management .proxy-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+    align-items: center;
+    padding: 8px;
+    background: var(--bg-secondary);
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    transition: var(--transition);
+}
+
+.proxy-management .proxy-item:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(--primary-10);
+}
+
+/* 空状态 */
+.proxy-management .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-tertiary);
+}
+
+.proxy-management .empty-state i {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.proxy-management .empty-state p {
+    margin: 8px 0;
+    font-size: 16px;
+    color: var(--text-secondary);
+}
+
+.proxy-management .empty-state small {
+    font-size: 13px;
+}
+
+.proxy-management .proxy-icon {
+    color: var(--text-tertiary);
+    font-size: 16px;
+    margin-left: 4px;
+}
+
+/* 工具栏 */
+.proxy-list-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    background: var(--bg-secondary);
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+}
+
+.proxy-select-all {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.proxy-count {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    margin-left: auto;
+}
+
+.proxy-checkbox {
+    flex-shrink: 0;
+    flex-grow: 0;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    min-height: 16px;
+    max-width: 16px;
+    max-height: 16px;
+    box-sizing: border-box;
+    border: 2px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--bg-primary);
+    transition: var(--transition);
+    position: relative;
+    margin: 0;
+    padding: 0;
+    display: inline-block;
+}
+
+.proxy-checkbox:checked {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.proxy-checkbox:checked::after {
+    content: '';
+    position: absolute;
+    left: 3px;
+    top: 0px;
+    width: 5px;
+    height: 9px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.proxy-checkbox:hover {
+    border-color: var(--primary-color);
+}
+
+.proxy-select-all input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    min-height: 16px;
+    max-width: 16px;
+    max-height: 16px;
+    box-sizing: border-box;
+    border: 2px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--bg-primary);
+    transition: var(--transition);
+    position: relative;
+    cursor: pointer;
+    vertical-align: middle;
+    margin: 0;
+    padding: 0;
+    display: inline-block;
+}
+
+.proxy-select-all input[type="checkbox"]:checked {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.proxy-select-all input[type="checkbox"]:checked::after {
+    content: '';
+    position: absolute;
+    left: 3px;
+    top: 0px;
+    width: 5px;
+    height: 9px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.proxy-select-all input[type="checkbox"]:indeterminate {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.proxy-select-all input[type="checkbox"]:indeterminate::after {
+    content: '';
+    position: absolute;
+    left: 2px;
+    top: 5px;
+    width: 8px;
+    height: 2px;
+    background: white;
+    border-radius: 1px;
+}
+
+.proxy-select-all input[type="checkbox"]:hover {
+    border-color: var(--primary-color);
+}
+
+/* 底部操作按钮区 */
+.proxy-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+/* 分页 */
+.proxy-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 12px 0;
+}
+
+.pagination-btn {
+    padding: 6px 12px !important;
+    min-width: 36px;
+}
+
+.pagination-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.pagination-info {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* 健康检测组 */
+.outbound-proxy-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    transition: var(--transition);
+    box-sizing: border-box;
+}
+
+.outbound-proxy-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(--primary-10);
+}
+
+.outbound-proxy-input::placeholder {
+    color: var(--text-tertiary);
+    font-family: inherit;
+}
+
+.form-hint {
+    display: block;
+    margin-top: 4px;
+    font-size: 12px;
+    color: var(--text-tertiary);
+}
+.proxy-health-info {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 90px;
+    flex-shrink: 0;
+}
+
+.proxy-health-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.proxy-health-dot.health-ok {
+    background: var(--success-color, #22c55e);
+    box-shadow: 0 0 6px var(--success-color, #22c55e);
+}
+
+.proxy-health-dot.health-fail {
+    background: var(--danger-color, #ef4444);
+    box-shadow: 0 0 6px var(--danger-color, #ef4444);
+}
+
+.proxy-health-dot.health-unknown {
+    background: var(--text-tertiary, #9ca3af);
+    opacity: 0.5;
+}
+
+.proxy-latency {
+    font-size: 12px;
+    color: var(--success-color, #22c55e);
+    font-family: monospace;
+    font-weight: 500;
+}
+
+.proxy-error-text {
+    font-size: 12px;
+    color: var(--danger-color, #ef4444);
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

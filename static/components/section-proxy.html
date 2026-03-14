@@ -1,0 +1,65 @@
+<link rel="stylesheet" href="components/section-proxy.css">
+<link rel="stylesheet" href="components/proxy-modal.css">
+<section id="proxy" class="section">
+<div class="proxy-management">
+    <!-- 代理池配置 -->
+    <div class="proxy-pool-config card">
+        <h3>代理池配置</h3>
+
+        <div class="form-group">
+            <label>
+                <input type="checkbox" id="autoAssignProxy" />
+                自动为新账号分配代理
+            </label>
+        </div>
+
+        <div class="form-group">
+            <label>分配策略:</label>
+            <select id="assignStrategy">
+                <option value="hash">哈希分配（同一账号固定代理）</option>
+                <option value="round-robin">轮询分配</option>
+                <option value="random">随机分配</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>出站代理（可选）:</label>
+            <input type="text" id="proxyPoolOutbound" class="outbound-proxy-input"
+                   placeholder="如 socks5://127.0.0.1:7897，用于中转连接海外代理" />
+            <small class="form-hint">国内环境连接海外代理时需要，留空则直连</small>
+        </div>
+
+        <div class="form-group">
+            <label>代理列表:</label>
+            <div class="proxy-list-toolbar" id="proxyListToolbar" style="display:none">
+                <label class="proxy-select-all"><input type="checkbox" id="proxySelectAll" /> 全选</label>
+                <button id="batchDeleteProxyBtn" class="btn-danger btn-small" style="display:none">
+                    <i class="fas fa-trash"></i> 删除选中
+                </button>
+                <button id="deleteUnhealthyBtn" class="btn-danger btn-small" style="display:none">
+                    <i class="fas fa-times-circle"></i> 删除不可用
+                </button>
+                <span class="proxy-count" id="proxyCountInfo"></span>
+            </div>
+            <div id="proxyPoolList" class="proxy-list"></div>
+            <div id="proxyPagination" class="proxy-pagination"></div>
+            <button id="addProxyBtn" class="btn-secondary">
+                <i class="fas fa-plus"></i> 添加代理
+            </button>
+        </div>
+
+        <div class="proxy-stats" id="proxyStats"></div>
+
+        <div class="proxy-actions">
+            <button id="saveProxyPoolBtn" class="btn-primary">
+                <i class="fas fa-save"></i> 保存配置
+            </button>
+            <button id="checkProxyHealthBtn" class="btn-secondary">
+                <i class="fas fa-heartbeat"></i> 检测代理
+            </button>
+        </div>
+    </div>
+
+
+</div>
+</section>

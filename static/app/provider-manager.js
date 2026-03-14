@@ -1,7 +1,7 @@
 // 提供商管理功能模块
 
 import { providerStats, updateProviderStats } from './constants.js';
-import { showToast, formatUptime, getProviderConfigs } from './utils.js';
+import { showToast, showConfirm, formatUptime, getProviderConfigs } from './utils.js';
 import { fileUploadHandler } from './file-upload.js';
 import { t, getCurrentLanguage } from './i18n.js';
 import { renderRoutingExamples } from './routing-examples.js';
@@ -3003,7 +3003,7 @@ async function performUpdate() {
     const latestVersionText = document.getElementById('latestVersionText');
     const version = latestVersionText?.textContent || '';
 
-    if (!confirm(t('dashboard.update.confirmMsg', { version }))) {
+    if (!await showConfirm(t('dashboard.update.confirmMsg', { version }))) {
         return;
     }
 

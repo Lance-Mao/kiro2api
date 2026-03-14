@@ -1,6 +1,6 @@
 // 模态框管理模块
 
-import { showToast, getFieldLabel, getProviderTypeFields } from './utils.js';
+import { showToast, showConfirm, getFieldLabel, getProviderTypeFields } from './utils.js';
 import { handleProviderPasswordToggle } from './event-handlers.js';
 import { t } from './i18n.js';
 
@@ -943,7 +943,7 @@ async function saveProvider(uuid, event) {
 async function deleteProvider(uuid, event) {
     event.stopPropagation();
     
-    if (!confirm(t('modal.provider.deleteConfirm'))) {
+    if (!await showConfirm(t('modal.provider.deleteConfirm'))) {
         return;
     }
     
@@ -1344,7 +1344,7 @@ async function toggleProviderStatus(uuid, event) {
         t('modal.provider.enableConfirm') :
         t('modal.provider.disableConfirm');
     
-    if (!confirm(confirmMessage)) {
+    if (!await showConfirm(confirmMessage)) {
         return;
     }
     
@@ -1365,7 +1365,7 @@ async function toggleProviderStatus(uuid, event) {
  * @param {string} providerType - 提供商类型
  */
 async function resetAllProvidersHealth(providerType) {
-    if (!confirm(t('modal.provider.resetHealthConfirm', {type: providerType}))) {
+    if (!await showConfirm(t('modal.provider.resetHealthConfirm', {type: providerType}))) {
         return;
     }
     
@@ -1399,7 +1399,7 @@ async function resetAllProvidersHealth(providerType) {
  * @param {string} providerType - 提供商类型
  */
 async function performHealthCheck(providerType) {
-    if (!confirm(t('modal.provider.healthCheckConfirm', {type: providerType}))) {
+    if (!await showConfirm(t('modal.provider.healthCheckConfirm', {type: providerType}))) {
         return;
     }
     
@@ -1445,7 +1445,7 @@ async function performHealthCheck(providerType) {
 async function refreshProviderUuid(uuid, event) {
     event.stopPropagation();
     
-    if (!confirm(t('modal.provider.refreshUuidConfirm', { oldUuid: uuid }))) {
+    if (!await showConfirm(t('modal.provider.refreshUuidConfirm', { oldUuid: uuid }))) {
         return;
     }
     
@@ -1488,7 +1488,7 @@ async function deleteUnhealthyProviders(providerType) {
         return;
     }
     
-    if (!confirm(t('modal.provider.deleteUnhealthyConfirm', { type: providerType, count: unhealthyCount }))) {
+    if (!await showConfirm(t('modal.provider.deleteUnhealthyConfirm', { type: providerType, count: unhealthyCount }))) {
         return;
     }
     
@@ -1533,7 +1533,7 @@ async function refreshUnhealthyUuids(providerType) {
         return;
     }
     
-    if (!confirm(t('modal.provider.refreshUnhealthyUuidsConfirm', { type: providerType, count: unhealthyCount }))) {
+    if (!await showConfirm(t('modal.provider.refreshUnhealthyUuidsConfirm', { type: providerType, count: unhealthyCount }))) {
         return;
     }
     

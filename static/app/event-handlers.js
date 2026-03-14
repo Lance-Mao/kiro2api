@@ -1,7 +1,7 @@
 // 事件监听器模块
 
 import { elements, autoScroll, setAutoScroll, clearLogs } from './constants.js';
-import { showToast } from './utils.js';
+import { showToast, showConfirm } from './utils.js';
 import { t } from './i18n.js';
 import { checkUpdate, performUpdate } from './provider-manager.js';
 
@@ -18,7 +18,7 @@ function initEventListeners() {
     if (elements.clearLogsBtn) {
         elements.clearLogsBtn.addEventListener('click', async () => {
             // 显示确认对话框，明确提示会清空本地日志文件
-            const confirmed = confirm(t('logs.clear.confirm.msg'));
+            const confirmed = await showConfirm(t('logs.clear.confirm.msg'));
             
             if (!confirmed) {
                 return;
@@ -507,7 +507,7 @@ async function handleRestart() {
  */
 async function handleReloadConfig() {
     // 确认重载操作
-    if (!confirm(t('header.reload.confirm'))) {
+    if (!await showConfirm(t('header.reload.confirm'))) {
         return;
     }
     
@@ -529,7 +529,7 @@ async function handleReloadConfig() {
  */
 async function handleRestartService() {
     // 确认重启操作
-    if (!confirm(t('header.restart.confirm'))) {
+    if (!await showConfirm(t('header.restart.confirm'))) {
         return;
     }
     

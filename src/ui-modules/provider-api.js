@@ -134,6 +134,16 @@ export async function handleAddProvider(req, res, currentConfig, providerPoolMan
         }
         providerPools[providerType].push(providerConfig);
 
+        // 自动分配代理
+        if (currentConfig.PROXY_AUTO_ASSIGN !== false && providerPoolManager?.proxyPoolManager) {
+            const proxyUrl = providerPoolManager.proxyPoolManager.assignProxyForAccount(providerConfig.uuid, providerConfig);
+            if (proxyUrl && !providerConfig.PROXY_URL) {
+                providerConfig.PROXY_URL = proxyUrl;
+                providerConfig._proxyAutoAssigned = true;
+                logger.info(`[UI API] Auto-assigned proxy to new provider ${providerConfig.uuid}`);
+            }
+        }
+
         // Save to file
         writeFileSync(filePath, JSON.stringify(providerPools, null, 2), 'utf-8');
         logger.info(`[UI API] Added new provider to ${providerType}: ${providerConfig.uuid}`);
@@ -906,6 +916,17 @@ export async function handleQuickLinkProvider(req, res, currentConfig, providerP
             });
 
             providerPools[providerType].push(newProvider);
+
+            // 自动分配代理
+            if (currentConfig.PROXY_AUTO_ASSIGN !== false && providerPoolManager?.proxyPoolManager) {
+                const proxyUrl = providerPoolManager.proxyPoolManager.assignProxyForAccount(newProvider.uuid, newProvider);
+                if (proxyUrl && !newProvider.PROXY_URL) {
+                    newProvider.PROXY_URL = proxyUrl;
+                    newProvider._proxyAutoAssigned = true;
+                    logger.info(`[UI API] Auto-assigned proxy to quick-linked provider ${newProvider.uuid}`);
+                }
+            }
+
             linkedProviders.push({ providerType, provider: newProvider });
 
             results.push({

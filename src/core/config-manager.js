@@ -63,6 +63,7 @@ export async function initializeConfig(args = process.argv.slice(2), configFileP
         SYSTEM_PROMPT_MODE: 'append',
         PROXY_URL: null, // HTTP/HTTPS/SOCKS5 代理地址，如 http://127.0.0.1:7890 或 socks5://127.0.0.1:1080
         PROXY_ENABLED_PROVIDERS: [], // 启用代理的提供商列表，如 ['gemini-cli-oauth', 'claude-kiro-oauth']
+        PROXY_POOL_OUTBOUND: null, // 代理池出站代理，国内中转连接海外代理用，如 socks5://127.0.0.1:7897
         PROMPT_LOG_BASE_NAME: "prompt_log",
         PROMPT_LOG_MODE: "none",
         REQUEST_MAX_RETRIES: 3,

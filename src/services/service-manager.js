@@ -188,7 +188,34 @@ async function linkSingleCredential(config, credPath) {
             defaultCheckModel,
             needsProjectId
         });
-        
+
+        // 如果启用了自动分配代理且代理池非空，则自动分配
+        const proxyPool = config.PROXY_POOL || [];
+        if (config.PROXY_AUTO_ASSIGN !== false && proxyPool.length > 0) {
+            let proxyUrl = null;
+            if (providerPoolManager?.proxyPoolManager) {
+                proxyUrl = providerPoolManager.proxyPoolManager.assignProxyForAccount(newProvider.uuid, {});
+            } else {
+                // proxyPoolManager 未初始化时，直接从配置里取（hash 策略）
+                const crypto = await import('crypto');
+                const hash = crypto.default.createHash('md5').update(newProvider.uuid).digest('hex');
+                const index = parseInt(hash.substring(0, 8), 16) % proxyPool.length;
+                proxyUrl = proxyPool[index];
+            }
+            if (proxyUrl) {
+                newProvider.PROXY_URL = proxyUrl;
+                newProvider._proxyAutoAssigned = true;
+                // 脱敏日志
+                let maskedUrl = proxyUrl;
+                try {
+                    const u = new URL(proxyUrl);
+                    if (u.username) { u.username = u.username.substring(0, 3) + '***'; u.password = '***'; }
+                    maskedUrl = u.toString();
+                } catch {}
+                logger.info(`[Auto-Link] Auto-assigned proxy to ${newProvider.uuid}: ${maskedUrl}`);
+            }
+        }
+
         // 添加到配置
         config.providerPools[providerType].push(newProvider);
         

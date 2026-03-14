@@ -476,9 +476,9 @@ export class KiroApiService {
             axiosConfig.proxy = false;
         }
         
-        // 配置自定义代理
-        configureAxiosProxy(axiosConfig, this.config, this.config.MODEL_PROVIDER || 'claude-kiro-oauth');
-        
+        // 配置自定义代理（传递账号配置以支持账号级代理）
+        configureAxiosProxy(axiosConfig, this.config, this.config.MODEL_PROVIDER || 'claude-kiro-oauth', this.config);
+
         this.axiosInstance = axios.create(axiosConfig);
 
         axiosConfig.headers = new Headers();
@@ -579,6 +579,18 @@ async loadCredentials() {
         this.profileArn = this.profileArn || mergedCredentials.profileArn;
         this.region = this.region || mergedCredentials.region;
         this.idcRegion = this.idcRegion || mergedCredentials.idcRegion;
+
+        // 推断 Idp 值（用于 Cookie 认证）
+        if (!this.idp) {
+            if (this.authMethod === KIRO_CONSTANTS.AUTH_METHOD_SOCIAL) {
+                // social 认证：从凭证中读取 provider 字段（GOOGLE/GITHUB）
+                const provider = mergedCredentials.provider || mergedCredentials.idp || '';
+                this.idp = provider.toUpperCase() || 'GOOGLE';
+            } else {
+                // IdC / builder-id 认证
+                this.idp = 'BUILDER_ID';
+            }
+        }
 
         if (!this.region) {
             logger.warn('[Kiro Auth] Region not found in credentials. Using default region us-east-1 for URLs.');
@@ -1455,6 +1467,16 @@ async saveCredentialsToFile(filePath, newData) {
      */
     async callApi(method, model, body, isRetry = false, retryCount = 0) {
         if (!this.isInitialized) await this.initialize();
+
+        // 检查 token 是否即将过期（5分钟内），提前触发后台刷新
+        if (this.expiresAt) {
+            const remaining = new Date(this.expiresAt).getTime() - Date.now();
+            if (remaining < 5 * 60 * 1000 && remaining > 0) {
+                logger.info('[Kiro] Token expiring soon, triggering proactive refresh...');
+                this._markCredentialNeedRefresh('Token expiring soon - proactive refresh');
+            }
+        }
+
         const maxRetries = this.config.REQUEST_MAX_RETRIES || 3;
         const baseDelay = this.config.REQUEST_BASE_DELAY || 1000; // 1 second base delay
 
@@ -1479,6 +1501,7 @@ async saveCredentialsToFile(filePath, newData) {
             const headers = {
                 'Authorization': `Bearer ${token}`,
                 'amz-sdk-invocation-id': `${uuidv4()}`,
+                'Cookie': `Idp=${this.idp || 'BUILDER_ID'}; AccessToken=${token}`,
             };
 
             // 当 model 以 kiro-amazonq 开头时，使用 amazonQUrl，否则使用 baseUrl
@@ -1537,13 +1560,24 @@ async saveCredentialsToFile(filePath, newData) {
                     // }
                     this._markCredentialNeedRefresh('403 Forbidden', error);
                 }
-                
+
                 // Mark error for credential switch without recording error count
                 error.shouldSwitchCredential = true;
                 error.skipErrorCount = true;
                 throw error;
             }
-            
+
+            // Handle 423 (Locked) - Account suspended/banned
+            if (status === 423 && !isRetry) {
+                const responseData = error.response?.data;
+                const errorDetail = typeof responseData === 'string' ? responseData : JSON.stringify(responseData || '');
+                logger.error(`[Kiro] Received 423 Locked. Account suspended: ${errorDetail}`);
+                this._markCredentialUnhealthy('423 Locked - Account suspended', error);
+                error.shouldSwitchCredential = true;
+                error.skipErrorCount = true;
+                throw error;
+            }
+
             // Handle 429 (Too Many Requests) - wait baseDelay then switch credential
             if (status === 429) {
                 logger.info(`[Kiro] Received 429 (Too Many Requests). Waiting ${baseDelay}ms before switching credential...`);
