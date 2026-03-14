@@ -126,6 +126,9 @@ async function getProviderTypeUsage(providerType, currentConfig, providerPoolMan
             }
         }
 
+        // Re-read health status after usage query (adapter may have marked it unhealthy during the query)
+        instanceResult.isHealthy = provider.isHealthy !== false;
+
         result.instances.push(instanceResult);
     }
 
@@ -367,6 +370,9 @@ async function getSingleInstanceUsage(providerType, uuid, currentConfig, provide
             instanceResult.error = error.message;
         }
     }
+
+    // Re-read health status after usage query (adapter may have marked it unhealthy during the query)
+    instanceResult.isHealthy = provider.isHealthy !== false;
 
     return instanceResult;
 }
